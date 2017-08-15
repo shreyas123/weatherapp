@@ -10,14 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170815225338) do
+ActiveRecord::Schema.define(version: 20170815230007) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "pg_trgm"
+
+  create_table "cities", force: :cascade do |t|
+    t.string "name"
+    t.bigint "country_id"
+    t.float "lat"
+    t.float "lon"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "name gin_trgm_ops", name: "index_cities_on_name", using: :gin
+    t.index ["country_id"], name: "index_cities_on_country_id"
+    t.index ["name", "country_id"], name: "index_cities_on_name_and_country_id"
+  end
 
   create_table "countries", force: :cascade do |t|
     t.string "code"
     t.index ["code"], name: "index_countries_on_code", unique: true
   end
 
+  add_foreign_key "cities", "countries"
 end
